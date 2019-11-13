@@ -31,15 +31,10 @@ class DueDateCalcUtil {
         }
     }
 
-    static LocalDateTime getEndOfActualWorkingDay(LocalDateTime submitDateTime) {
+    private static LocalDateTime getEndOfActualWorkingDay(LocalDateTime submitDateTime) {
         return submitDateTime
                 .toLocalDate()
                 .atTime(17, 0);
-    }
-
-    static long calculateMinsToEndOfActualWorkingDay(LocalDateTime submitDateTime) {
-        long minsFromStartOfDay = submitDateTime.getHour()*60 + submitDateTime.getMinute();
-        return 17*60 - minsFromStartOfDay;
     }
 
 }

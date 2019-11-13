@@ -10,42 +10,27 @@ public class DueDateCalcImpl implements DueDateCalc {
 
         DueDateCalcUtil.checkInputParameters(submitDateTime, turnaroundHours);
 
-        long turnaroundMins = Math.round(turnaroundHours * 60);
+        int turnaroundMins = Math.round(turnaroundHours * 60);
 
         return calculate(submitDateTime, turnaroundMins);
     }
 
-    private LocalDateTime calculate(LocalDateTime submitDateTime, long turnaroundMins) {
+    private LocalDateTime calculate(LocalDateTime submitDateTime, int turnaroundMins) {
 
-        long minsToEndOfActualWorkingDay = DueDateCalcUtil.calculateMinsToEndOfActualWorkingDay(submitDateTime);
-        long minsRemainAfterFirstDay = turnaroundMins - minsToEndOfActualWorkingDay;
+        int minsFromStartOfActualDay = submitDateTime.getHour() * 60 - 9 * 60 + submitDateTime.getMinute() + turnaroundMins;
 
-        if(minsRemainAfterFirstDay > 0) {
-            return calculateCarryOverDateTime(submitDateTime, minsRemainAfterFirstDay);
-        } else {
-            return submitDateTime.plusMinutes(turnaroundMins);
-        }
+        int days = (minsFromStartOfActualDay - 1) / (8 * 60);
+        int weekendDays = getNumOfWeekendDays(submitDateTime, days);
+
+        int sumOfMins = turnaroundMins + days * 16 * 60 + weekendDays * 24 * 60;
+
+        return submitDateTime.plusMinutes(sumOfMins);
     }
 
-    private LocalDateTime calculateCarryOverDateTime(LocalDateTime submitDateTime, long minsRemainAfterFirstDay) {
-        long daysToAdd = (minsRemainAfterFirstDay -1) / (8 * 60);
-        long minsRemainForLastDay = minsRemainAfterFirstDay - (daysToAdd * 8 * 60);
-
-        daysToAdd += calculateWeekendOffsetDays(submitDateTime, daysToAdd);
-        LocalDateTime calculateFrom = getStartOfNextWorkingDay(submitDateTime);
-        return calculateFrom.plusDays(daysToAdd).plusMinutes(minsRemainForLastDay);
-    }
-
-    private long calculateWeekendOffsetDays(LocalDateTime submitDateTime, long days) {
-        long workingWeeks = (submitDateTime.getDayOfWeek().getValue() + days) / 5;
-        return workingWeeks * 2;
-    }
-
-    private LocalDateTime getStartOfNextWorkingDay(LocalDateTime submitDateTime) {
-        return submitDateTime
-                .plusDays(1)
-                .toLocalDate()
-                .atTime(9, 0);
+    private int getNumOfWeekendDays(LocalDateTime submitDateTime, int offsetDays) {
+        int actualDay = submitDateTime.getDayOfWeek().getValue();
+        int numOfWeekEnds = (actualDay + offsetDays - 1) / 5;
+        return numOfWeekEnds * 2;
     }
 
 }
