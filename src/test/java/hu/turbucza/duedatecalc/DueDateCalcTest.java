@@ -17,7 +17,6 @@ public class DueDateCalcTest {
 
     DueDateCalc underTest;
 
-
     @Before
     public void setup() {
         underTest = new DueDateCalcImpl();
@@ -90,6 +89,73 @@ public class DueDateCalcTest {
 
         // then
         assertEquals(toDate("2019-11-19 12:00"), actual);
+    }
+
+    @Test
+    public void calcCarryOverMultipleWeekends() {
+        // given
+        String submitDate = "2019-11-15 15:30";
+
+        // when
+        LocalDateTime actual = underTest.calculate(toDate(submitDate), 62.5f);
+
+        // then
+        assertEquals(toDate("2019-11-27 14:00"), actual);
+    }
+
+    @Test
+    public void calcCarryOverWeekendWithSomeHour() {
+        // given
+        String submitDate = "2019-11-15 15:30";
+
+        // when
+        LocalDateTime actual = underTest.calculate(toDate(submitDate), 2.5f);
+
+        // then
+        assertEquals(toDate("2019-11-18 10:00"), actual);
+    }
+
+    @Test
+    public void calcOneExactDay() {
+        // given
+        // when
+        LocalDateTime actual = underTest.calculate(SUBMIT_DATE, 8f);
+
+        // then
+        assertEquals(toDate("2019-11-13 17:00"), actual);
+    }
+
+    @Test
+    public void calcTwoExactDays() {
+        // given
+
+        // when
+        LocalDateTime actual = underTest.calculate(SUBMIT_DATE, 16f);
+
+        // then
+        assertEquals(toDate("2019-11-14 17:00"), actual);
+    }
+
+    @Test
+    public void calcThreeExactDaysWithWeekend() {
+        // given
+        String submitDate = "2019-11-15 09:00";
+
+        // when
+        LocalDateTime actual = underTest.calculate(toDate(submitDate), 24f);
+
+        // then
+        assertEquals(toDate("2019-11-19 17:00"), actual);
+    }
+
+    @Test
+    public void calcZeroHours() {
+        // given
+        // when
+        LocalDateTime actual = underTest.calculate(SUBMIT_DATE, 0f);
+
+        // then
+        assertEquals(SUBMIT_DATE, actual);
     }
 
     private LocalDateTime toDate(String parseFrom) {
