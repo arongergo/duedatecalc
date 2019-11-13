@@ -46,6 +46,18 @@ public class DueDateCalcTest {
         assertEquals(toDate("2019-11-03 15:00"), actual);
     }
 
+    @Test
+    public void calcFragmentHours() {
+        // given
+        String submitDate = "2019-11-03 09:00";
+
+        // when
+        LocalDateTime actual = DueDateCalc.calculate(toDate(submitDate), 6.5f);
+
+        // then
+        assertEquals(toDate("2019-11-03 15:30"), actual);
+    }
+
     private LocalDateTime toDate(String parseFrom) {
         return LocalDateTime.parse(parseFrom, formatter);
     }
