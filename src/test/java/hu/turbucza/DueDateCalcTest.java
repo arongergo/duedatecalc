@@ -9,7 +9,9 @@ import static org.junit.Assert.assertEquals;
 
 public class DueDateCalcTest {
 
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private static final String SUBMIT_DATE_STRING = "2019-11-13 09:00";
+    private static final LocalDateTime SUBMIT_DATE = LocalDateTime.parse(SUBMIT_DATE_STRING, FORMATTER);
 
     @Test(expected=IllegalArgumentException.class)
     public void calcNullDate() {
@@ -18,47 +20,45 @@ public class DueDateCalcTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void calcNullHours() {
-        // given
-        String submitDate = "2019-11-03 09:00";
-
-        // when
-        DueDateCalc.calculate(toDate(submitDate), null);
+        DueDateCalc.calculate(SUBMIT_DATE, null);
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void calcNegativeHours() {
-        // given
-        String submitDate = "2019-11-03 09:00";
-
-        // when
-        DueDateCalc.calculate(toDate(submitDate), -12f);
+        DueDateCalc.calculate(SUBMIT_DATE, -12f);
     }
 
     @Test
     public void calcInWorkday() {
         // given
-        String submitDate = "2019-11-03 09:00";
-
         // when
-        LocalDateTime actual = DueDateCalc.calculate(toDate(submitDate), 6f);
+        LocalDateTime actual = DueDateCalc.calculate(SUBMIT_DATE, 6f);
 
         // then
-        assertEquals(toDate("2019-11-03 15:00"), actual);
+        assertEquals(toDate("2019-11-13 15:00"), actual);
     }
 
     @Test
     public void calcFragmentHours() {
         // given
-        String submitDate = "2019-11-03 09:00";
-
         // when
-        LocalDateTime actual = DueDateCalc.calculate(toDate(submitDate), 6.5f);
+        LocalDateTime actual = DueDateCalc.calculate(SUBMIT_DATE, 6.5f);
 
         // then
-        assertEquals(toDate("2019-11-03 15:30"), actual);
+        assertEquals(toDate("2019-11-13 15:30"), actual);
+    }
+
+    @Test
+    public void calcCarryOverDays() {
+        // given
+        // when
+        LocalDateTime actual = DueDateCalc.calculate(SUBMIT_DATE, 9.5f);
+
+        // then
+        assertEquals(toDate("2019-11-14 10:30"), actual);
     }
 
     private LocalDateTime toDate(String parseFrom) {
-        return LocalDateTime.parse(parseFrom, formatter);
+        return LocalDateTime.parse(parseFrom, FORMATTER);
     }
 }
