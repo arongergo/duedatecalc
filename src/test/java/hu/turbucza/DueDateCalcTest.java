@@ -70,6 +70,18 @@ public class DueDateCalcTest {
         assertEquals(toDate("2019-11-15 12:00"), actual);
     }
 
+    @Test
+    public void calcCarryOverWeekend() {
+        // given
+        String submitDate = "2019-11-15 15:30";
+
+        // when
+        LocalDateTime actual = DueDateCalc.calculate(toDate(submitDate), 12.5f);
+
+        // then
+        assertEquals(toDate("2019-11-19 12:00"), actual);
+    }
+
     private LocalDateTime toDate(String parseFrom) {
         return LocalDateTime.parse(parseFrom, FORMATTER);
     }
