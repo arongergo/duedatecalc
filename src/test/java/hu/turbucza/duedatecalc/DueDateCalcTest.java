@@ -1,6 +1,5 @@
 package hu.turbucza.duedatecalc;
 
-import hu.turbucza.duedatecalc.impl.DueDateCalcImpl;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -9,17 +8,19 @@ import java.time.format.DateTimeFormatter;
 
 import static org.junit.Assert.assertEquals;
 
-public class DueDateCalcTest {
+public abstract class DueDateCalcTest {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     private static final String SUBMIT_DATE_STRING = "2019-11-13 09:00";
     private static final LocalDateTime SUBMIT_DATE = LocalDateTime.parse(SUBMIT_DATE_STRING, FORMATTER);
 
-    DueDateCalc underTest;
+    private DueDateCalc underTest;
+
+    protected abstract DueDateCalc createDueDateCalcInstance();
 
     @Before
     public void setup() {
-        underTest = new DueDateCalcImpl();
+        underTest = createDueDateCalcInstance();
     }
 
     @Test(expected=IllegalArgumentException.class)
