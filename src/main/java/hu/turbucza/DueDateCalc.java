@@ -5,12 +5,17 @@ import java.time.LocalDateTime;
 public class DueDateCalc {
 
     public static LocalDateTime calculate(LocalDateTime submitDate, Float turnaroundHours) {
-        checkSubmitDate(submitDate);
-        checkTurnaroundHours(turnaroundHours);
-        return submitDate.plusHours(turnaroundHours.intValue());
+
+        checkSubmitDateValidity(submitDate);
+        checkTurnaroundHoursValidity(turnaroundHours);
+
+        long hours = turnaroundHours.longValue();
+        long minutes = (long) (60 * (turnaroundHours - hours));
+
+        return submitDate.plusHours(hours).plusMinutes(minutes);
     }
 
-    private static void checkTurnaroundHours(Float turnaroundHours) {
+    private static void checkTurnaroundHoursValidity(Float turnaroundHours) {
         if(turnaroundHours == null) {
             throw new IllegalArgumentException("Turnaround hours must not be null!");
         }
@@ -19,7 +24,7 @@ public class DueDateCalc {
         }
     }
 
-    private static void checkSubmitDate(LocalDateTime submitDate) {
+    private static void checkSubmitDateValidity(LocalDateTime submitDate) {
         if(submitDate == null) {
             throw new IllegalArgumentException("Submit date/time must not be null!");
         }
