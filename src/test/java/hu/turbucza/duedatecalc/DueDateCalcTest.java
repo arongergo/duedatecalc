@@ -1,5 +1,7 @@
-package hu.turbucza;
+package hu.turbucza.duedatecalc;
 
+import hu.turbucza.duedatecalc.impl.DueDateCalcImpl;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
@@ -13,26 +15,34 @@ public class DueDateCalcTest {
     private static final String SUBMIT_DATE_STRING = "2019-11-13 09:00";
     private static final LocalDateTime SUBMIT_DATE = LocalDateTime.parse(SUBMIT_DATE_STRING, FORMATTER);
 
+    DueDateCalc underTest;
+
+
+    @Before
+    public void setup() {
+        underTest = new DueDateCalcImpl();
+    }
+
     @Test(expected=IllegalArgumentException.class)
     public void calcNullDate() {
-        DueDateCalc.calculate(null, 4f);
+        underTest.calculate(null, 4f);
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void calcNullHours() {
-        DueDateCalc.calculate(SUBMIT_DATE, null);
+        underTest.calculate(SUBMIT_DATE, null);
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void calcNegativeHours() {
-        DueDateCalc.calculate(SUBMIT_DATE, -12f);
+        underTest.calculate(SUBMIT_DATE, -12f);
     }
 
     @Test
     public void calcInWorkday() {
         // given
         // when
-        LocalDateTime actual = DueDateCalc.calculate(SUBMIT_DATE, 6f);
+        LocalDateTime actual = underTest.calculate(SUBMIT_DATE, 6f);
 
         // then
         assertEquals(toDate("2019-11-13 15:00"), actual);
@@ -42,7 +52,7 @@ public class DueDateCalcTest {
     public void calcFragmentHours() {
         // given
         // when
-        LocalDateTime actual = DueDateCalc.calculate(SUBMIT_DATE, 6.5f);
+        LocalDateTime actual = underTest.calculate(SUBMIT_DATE, 6.5f);
 
         // then
         assertEquals(toDate("2019-11-13 15:30"), actual);
@@ -52,7 +62,7 @@ public class DueDateCalcTest {
     public void calcCarryOverDays() {
         // given
         // when
-        LocalDateTime actual = DueDateCalc.calculate(SUBMIT_DATE, 9.5f);
+        LocalDateTime actual = underTest.calculate(SUBMIT_DATE, 9.5f);
 
         // then
         assertEquals(toDate("2019-11-14 10:30"), actual);
@@ -64,7 +74,7 @@ public class DueDateCalcTest {
         String submitDate = "2019-11-13 15:30";
 
         // when
-        LocalDateTime actual = DueDateCalc.calculate(toDate(submitDate), 12.5f);
+        LocalDateTime actual = underTest.calculate(toDate(submitDate), 12.5f);
 
         // then
         assertEquals(toDate("2019-11-15 12:00"), actual);
@@ -76,7 +86,7 @@ public class DueDateCalcTest {
         String submitDate = "2019-11-15 15:30";
 
         // when
-        LocalDateTime actual = DueDateCalc.calculate(toDate(submitDate), 12.5f);
+        LocalDateTime actual = underTest.calculate(toDate(submitDate), 12.5f);
 
         // then
         assertEquals(toDate("2019-11-19 12:00"), actual);
