@@ -9,10 +9,13 @@ public class DueDateCalc {
         checkSubmitDateValidity(submitDate);
         checkTurnaroundHoursValidity(turnaroundHours);
 
-        long hours = turnaroundHours.longValue();
-        long minutes = (long) (60 * (turnaroundHours - hours));
+        long turnaroundMins = (long)(turnaroundHours * 60);
+        long minsFromStartOfDay = submitDate.getHour()*60 + submitDate.getMinute();
+        long minsFromStartOfWorkingHours = minsFromStartOfDay - 9*60;
+        long days = (turnaroundMins + minsFromStartOfWorkingHours) / (8 * 60);
+        long minsInWorkDay = (turnaroundMins + minsFromStartOfWorkingHours) - (days * 8 * 60);
 
-        return submitDate.plusHours(hours).plusMinutes(minutes);
+        return submitDate.plusDays(days).plusMinutes(minsInWorkDay);
     }
 
     private static void checkTurnaroundHoursValidity(Float turnaroundHours) {
