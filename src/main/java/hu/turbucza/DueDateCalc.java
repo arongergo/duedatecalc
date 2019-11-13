@@ -4,18 +4,46 @@ import java.time.LocalDateTime;
 
 public class DueDateCalc {
 
-    public static LocalDateTime calculate(LocalDateTime submitDate, Float turnaroundHours) {
+    public static LocalDateTime calculate(LocalDateTime submitDateTime, Float turnaroundHours) {
 
-        checkSubmitDateValidity(submitDate);
+        checkSubmitDateValidity(submitDateTime);
         checkTurnaroundHoursValidity(turnaroundHours);
 
         long turnaroundMins = (long)(turnaroundHours * 60);
-        long minsFromStartOfDay = submitDate.getHour()*60 + submitDate.getMinute();
-        long minsFromStartOfWorkingHours = minsFromStartOfDay - 9*60;
-        long days = (turnaroundMins + minsFromStartOfWorkingHours) / (8 * 60);
-        long minsInWorkDay = (turnaroundMins + minsFromStartOfWorkingHours) - (days * 8 * 60);
 
-        return submitDate.plusDays(days).plusMinutes(minsInWorkDay);
+        return calculate(submitDateTime, turnaroundMins);
+    }
+
+    private static LocalDateTime calculate(LocalDateTime submitDateTime, long turnaroundMins) {
+
+        long minsToEndOfCurrentWorkingDay = calculateMinsToEndOfCurrentWorkingDay(submitDateTime);
+        long minsRemainForNextDays = turnaroundMins - minsToEndOfCurrentWorkingDay;
+
+        if(minsRemainForNextDays > 0) {
+            return calculateCarryOverDateTime(submitDateTime, minsRemainForNextDays);
+        } else {
+            return submitDateTime.plusMinutes(turnaroundMins);
+        }
+    }
+
+    private static LocalDateTime calculateCarryOverDateTime(LocalDateTime submitDateTime, long minsRemainForNextDays) {
+        long days = minsRemainForNextDays / (8 * 60);
+        long minsRemainForLastDay = minsRemainForNextDays - (days * 8 * 60);
+
+        LocalDateTime startOfNextWorkingDay = getStartOfNextWorkingDay(submitDateTime);
+        return startOfNextWorkingDay.plusDays(days).plusMinutes(minsRemainForLastDay);
+    }
+
+    private static LocalDateTime getStartOfNextWorkingDay(LocalDateTime submitDateTime) {
+        return submitDateTime
+                .plusDays(1)
+                .toLocalDate()
+                .atTime(9, 0);
+    }
+
+    private static long calculateMinsToEndOfCurrentWorkingDay(LocalDateTime submitDateTime) {
+        long minsFromStartOfDay = submitDateTime.getHour()*60 + submitDateTime.getMinute();
+        return 17*60 - minsFromStartOfDay;
     }
 
     private static void checkTurnaroundHoursValidity(Float turnaroundHours) {
