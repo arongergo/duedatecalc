@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public abstract class DueDateCalcTest {
 
@@ -25,17 +26,59 @@ public abstract class DueDateCalcTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void calcNullDate() {
+        // given
+        //when
         underTest.calculate(null, 4f);
+        //then
+        fail();
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void calcNullHours() {
+        // given
+        //when
         underTest.calculate(SUBMIT_DATE, null);
+        //then
+        fail();
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void calcNegativeHours() {
+        // given
+        //when
         underTest.calculate(SUBMIT_DATE, -12f);
+        //then
+        fail();
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void calcNonWorkingHours_1() {
+        // given
+        String submitDate = "2019-11-13 17:30";
+        //when
+        underTest.calculate(toDate(submitDate), 3f);
+        //then
+        fail();
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void calcNonWorkingHours_2() {
+        // given
+        String submitDate = "2019-11-13 08:59";
+        //when
+        underTest.calculate(toDate(submitDate), 3f);
+        //then
+        fail();
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void calcNonWorkingDays() {
+        // given
+        String submitDate = "2019-11-16 10:00";
+        //when
+        underTest.calculate(toDate(submitDate), 3f);
+        //then
+        fail();
     }
 
     @Test
