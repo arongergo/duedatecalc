@@ -33,8 +33,13 @@ public class DueDateCalcImpl implements DueDateCalc {
         long minsRemainForLastDay = minsRemainAfterFirstDay - (daysRemainAfterFirstDay * 8 * 60);
 
         long daysToAdd = calculateDaysToAdd(submitDateTime, daysRemainAfterFirstDay);
-        LocalDateTime startOfNextWorkingDay = getStartOfNextWorkingDay(submitDateTime);
-        return startOfNextWorkingDay.plusDays(daysToAdd).plusMinutes(minsRemainForLastDay);
+        LocalDateTime calculateFrom;
+        if(minsRemainForLastDay > 0) {
+            calculateFrom = getStartOfNextWorkingDay(submitDateTime);
+        } else {
+            calculateFrom = getEndOfActualWorkingDay(submitDateTime);
+        }
+        return calculateFrom.plusDays(daysToAdd).plusMinutes(minsRemainForLastDay);
     }
 
     private long calculateDaysToAdd(LocalDateTime submitDateTime, long days) {
@@ -47,6 +52,12 @@ public class DueDateCalcImpl implements DueDateCalc {
                 .plusDays(1)
                 .toLocalDate()
                 .atTime(9, 0);
+    }
+
+    private LocalDateTime getEndOfActualWorkingDay(LocalDateTime submitDateTime) {
+        return submitDateTime
+                .toLocalDate()
+                .atTime(17, 0);
     }
 
     private long calculateMinsToEndOfActualWorkingDay(LocalDateTime submitDateTime) {
