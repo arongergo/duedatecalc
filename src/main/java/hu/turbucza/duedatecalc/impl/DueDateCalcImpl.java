@@ -10,7 +10,7 @@ public class DueDateCalcImpl implements DueDateCalc {
 
         DueDateCalcUtil.checkInputParameters(submitDateTime, turnaroundHours);
 
-        long turnaroundMins = (long)(turnaroundHours * 60);
+        long turnaroundMins = Math.round(turnaroundHours * 60);
 
         return calculate(submitDateTime, turnaroundMins);
     }
@@ -28,16 +28,11 @@ public class DueDateCalcImpl implements DueDateCalc {
     }
 
     private LocalDateTime calculateCarryOverDateTime(LocalDateTime submitDateTime, long minsRemainAfterFirstDay) {
-        long daysToAdd = minsRemainAfterFirstDay / (8 * 60);
+        long daysToAdd = (minsRemainAfterFirstDay -1) / (8 * 60);
         long minsRemainForLastDay = minsRemainAfterFirstDay - (daysToAdd * 8 * 60);
 
         daysToAdd += calculateWeekendOffsetDays(submitDateTime, daysToAdd);
-        LocalDateTime calculateFrom;
-        if(minsRemainForLastDay > 0) {
-            calculateFrom = getStartOfNextWorkingDay(submitDateTime);
-        } else {
-            calculateFrom = DueDateCalcUtil.getEndOfActualWorkingDay(submitDateTime);
-        }
+        LocalDateTime calculateFrom = getStartOfNextWorkingDay(submitDateTime);
         return calculateFrom.plusDays(daysToAdd).plusMinutes(minsRemainForLastDay);
     }
 

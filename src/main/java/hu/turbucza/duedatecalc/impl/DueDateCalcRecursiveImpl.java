@@ -8,10 +8,9 @@ public class DueDateCalcRecursiveImpl implements DueDateCalc {
 
     public LocalDateTime calculate(LocalDateTime submitDateTime, Float turnaroundHours) {
 
-
         DueDateCalcUtil.checkInputParameters(submitDateTime, turnaroundHours);
 
-        long turnaroundMins = (long)(turnaroundHours * 60);
+        long turnaroundMins = Math.round(turnaroundHours * 60);
 
         return calculate(submitDateTime, turnaroundMins);
     }
@@ -19,10 +18,10 @@ public class DueDateCalcRecursiveImpl implements DueDateCalc {
     private LocalDateTime calculate(LocalDateTime submitDateTime, long turnaroundMins) {
 
         long minsToEndOfActualWorkingDay = DueDateCalcUtil.calculateMinsToEndOfActualWorkingDay(submitDateTime);
-        long minsRemainAfterDay = turnaroundMins - minsToEndOfActualWorkingDay;
+        long minsRemainAfterFirstDay = turnaroundMins - minsToEndOfActualWorkingDay;
 
-        if(minsRemainAfterDay > 0) {
-            return calculate(getStartOfNextWorkingDay(submitDateTime), minsRemainAfterDay);
+        if(minsRemainAfterFirstDay > 0) {
+            return calculate(getStartOfNextWorkingDay(submitDateTime), minsRemainAfterFirstDay);
         } else {
             return submitDateTime.plusMinutes(turnaroundMins);
         }
