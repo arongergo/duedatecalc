@@ -16,22 +16,28 @@ public class DueDateCalc {
 
     private static LocalDateTime calculate(LocalDateTime submitDateTime, long turnaroundMins) {
 
-        long minsToEndOfCurrentWorkingDay = calculateMinsToEndOfCurrentWorkingDay(submitDateTime);
-        long minsRemainForNextDays = turnaroundMins - minsToEndOfCurrentWorkingDay;
+        long minsToEndOfActualWorkingDay = calculateMinsToEndOfActualWorkingDay(submitDateTime);
+        long minsRemainAfterFirstDay = turnaroundMins - minsToEndOfActualWorkingDay;
 
-        if(minsRemainForNextDays > 0) {
-            return calculateCarryOverDateTime(submitDateTime, minsRemainForNextDays);
+        if(minsRemainAfterFirstDay > 0) {
+            return calculateCarryOverDateTime(submitDateTime, minsRemainAfterFirstDay);
         } else {
             return submitDateTime.plusMinutes(turnaroundMins);
         }
     }
 
-    private static LocalDateTime calculateCarryOverDateTime(LocalDateTime submitDateTime, long minsRemainForNextDays) {
-        long days = minsRemainForNextDays / (8 * 60);
-        long minsRemainForLastDay = minsRemainForNextDays - (days * 8 * 60);
+    private static LocalDateTime calculateCarryOverDateTime(LocalDateTime submitDateTime, long minsRemainAfterFirstDay) {
+        long daysRemainAfterFirstDay = minsRemainAfterFirstDay / (8 * 60);
+        long minsRemainForLastDay = minsRemainAfterFirstDay - (daysRemainAfterFirstDay * 8 * 60);
 
+        long daysToAdd = calculateDaysToAdd(submitDateTime, daysRemainAfterFirstDay);
         LocalDateTime startOfNextWorkingDay = getStartOfNextWorkingDay(submitDateTime);
-        return startOfNextWorkingDay.plusDays(days).plusMinutes(minsRemainForLastDay);
+        return startOfNextWorkingDay.plusDays(daysToAdd).plusMinutes(minsRemainForLastDay);
+    }
+
+    private static long calculateDaysToAdd(LocalDateTime submitDateTime, long days) {
+        long workingWeeks = (submitDateTime.getDayOfWeek().getValue() + days) / 5;
+        return days + (workingWeeks * 2);
     }
 
     private static LocalDateTime getStartOfNextWorkingDay(LocalDateTime submitDateTime) {
@@ -41,7 +47,7 @@ public class DueDateCalc {
                 .atTime(9, 0);
     }
 
-    private static long calculateMinsToEndOfCurrentWorkingDay(LocalDateTime submitDateTime) {
+    private static long calculateMinsToEndOfActualWorkingDay(LocalDateTime submitDateTime) {
         long minsFromStartOfDay = submitDateTime.getHour()*60 + submitDateTime.getMinute();
         return 17*60 - minsFromStartOfDay;
     }
