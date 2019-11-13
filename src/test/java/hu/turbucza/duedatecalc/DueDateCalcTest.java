@@ -181,6 +181,50 @@ public abstract class DueDateCalcTest {
     }
 
     @Test
+    public void calcTwoExactDaysPlusOneMinute() {
+        // given
+
+        // when
+        LocalDateTime actual = underTest.calculate(SUBMIT_DATE, 16.0166f);
+
+        // then
+        assertEquals(toDate("2019-11-15 09:01"), actual);
+    }
+
+    @Test
+    public void calcTwoExactDaysPlusTwoMinutes() {
+        // given
+
+        // when
+        LocalDateTime actual = underTest.calculate(SUBMIT_DATE, 16.0333f);
+
+        // then
+        assertEquals(toDate("2019-11-15 09:02"), actual);
+    }
+
+    @Test
+    public void calcTwoExactDaysMinusOneMinute() {
+        // given
+
+        // when
+        LocalDateTime actual = underTest.calculate(SUBMIT_DATE, 15.9833f);
+
+        // then
+        assertEquals(toDate("2019-11-14 16:59"), actual);
+    }
+
+    @Test
+    public void calcTwoExactDaysMinusTwoMinutes() {
+        // given
+
+        // when
+        LocalDateTime actual = underTest.calculate(SUBMIT_DATE, 15.9666f);
+
+        // then
+        assertEquals(toDate("2019-11-14 16:58"), actual);
+    }
+
+    @Test
     public void calcThreeExactDaysWithWeekend() {
         // given
         String submitDate = "2019-11-15 09:00";
