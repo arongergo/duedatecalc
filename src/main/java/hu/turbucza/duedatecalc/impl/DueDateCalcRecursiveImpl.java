@@ -8,8 +8,8 @@ public class DueDateCalcRecursiveImpl implements DueDateCalc {
 
     public LocalDateTime calculate(LocalDateTime submitDateTime, Float turnaroundHours) {
 
-        checkSubmitDateValidity(submitDateTime);
-        checkTurnaroundHoursValidity(turnaroundHours);
+
+        DueDateCalcUtil.checkInputParameters(submitDateTime, turnaroundHours);
 
         long turnaroundMins = (long)(turnaroundHours * 60);
 
@@ -18,7 +18,7 @@ public class DueDateCalcRecursiveImpl implements DueDateCalc {
 
     private LocalDateTime calculate(LocalDateTime submitDateTime, long turnaroundMins) {
 
-        long minsToEndOfActualWorkingDay = calculateMinsToEndOfActualWorkingDay(submitDateTime);
+        long minsToEndOfActualWorkingDay = DueDateCalcUtil.calculateMinsToEndOfActualWorkingDay(submitDateTime);
         long minsRemainAfterDay = turnaroundMins - minsToEndOfActualWorkingDay;
 
         if(minsRemainAfterDay > 0) {
@@ -26,11 +26,6 @@ public class DueDateCalcRecursiveImpl implements DueDateCalc {
         } else {
             return submitDateTime.plusMinutes(turnaroundMins);
         }
-    }
-
-    private long calculateMinsToEndOfActualWorkingDay(LocalDateTime submitDateTime) {
-        long minsFromStartOfDay = submitDateTime.getHour()*60 + submitDateTime.getMinute();
-        return 17*60 - minsFromStartOfDay;
     }
 
     private LocalDateTime getStartOfNextWorkingDay(LocalDateTime submitDateTime) {
@@ -41,18 +36,4 @@ public class DueDateCalcRecursiveImpl implements DueDateCalc {
                 .atTime(9, 0);
     }
 
-    private void checkTurnaroundHoursValidity(Float turnaroundHours) {
-        if(turnaroundHours == null) {
-            throw new IllegalArgumentException("Turnaround hours must not be null!");
-        }
-        if(turnaroundHours < 0) {
-            throw new IllegalArgumentException("Turnaround hours must not be positive!");
-        }
-    }
-
-    private void checkSubmitDateValidity(LocalDateTime submitDate) {
-        if(submitDate == null) {
-            throw new IllegalArgumentException("Submit date/time must not be null!");
-        }
-    }
 }

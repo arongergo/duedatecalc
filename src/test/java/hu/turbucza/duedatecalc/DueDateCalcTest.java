@@ -202,6 +202,13 @@ public abstract class DueDateCalcTest {
         assertEquals(SUBMIT_DATE, actual);
     }
 
+    @Test
+    public void testPerformance() {
+        for(int i = 0; i< 100000; i++) {
+            underTest.calculate(SUBMIT_DATE, 800f);
+        }
+    }
+
     private LocalDateTime toDate(String parseFrom) {
         return LocalDateTime.parse(parseFrom, FORMATTER);
     }
